@@ -6,14 +6,14 @@ export abstract class Shape {
   protected points: Point[];
 
   constructor(points: Point[]);
-  constructor(points: Point[], color: string = 'green', filled: boolean = true) {
+  constructor(points: Point[], color?: string, filled?: boolean) {
     if (points.length < 3) {
       throw 'Not enough points to build a shape';
     }
 
     this.points = points;
-    this.color = color;
-    this.filled = filled;
+    this.color = color ? color : 'green';
+    this.filled = filled !== undefined ? filled : true;
   }
 
   toString() {
