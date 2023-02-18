@@ -5,7 +5,6 @@ export abstract class Shape {
   protected filled: boolean;
   protected points: Point[];
 
-  constructor(points: Point[]);
   constructor(points: Point[], color?: string, filled?: boolean) {
     if (points.length < 3) {
       throw 'Not enough points to build a shape';
@@ -13,7 +12,7 @@ export abstract class Shape {
 
     this.points = points;
     this.color = color ? color : 'green';
-    this.filled = filled !== undefined ? filled : true;
+    this.filled = typeof filled === 'boolean' ? filled : true;
   }
 
   toString() {

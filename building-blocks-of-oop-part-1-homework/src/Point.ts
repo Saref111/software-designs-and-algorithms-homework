@@ -1,4 +1,4 @@
-const countCoordsDistance = (x1: number, x2: number, y1: number, y2: number) => Math.sqrt(Math.round(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)))
+const countCoordsDistance = (x1: number, x2: number, y1: number, y2: number) => Math.sqrt(Math.round(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
 
 export class Point {
     x: number;

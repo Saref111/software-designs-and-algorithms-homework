@@ -3,12 +3,9 @@ import { Shape } from "./Shape";
 
 export class Triangle extends Shape {
 
-    constructor(point1: Point, point2: Point, point3: Point) {
-        // if (!color && typeof filled !== 'boolean') {
-        //     super([point1, point2, point3]);
-        // }
-        
-        super([point1, point2, point3]);
+    constructor(point1: Point, point2: Point, point3: Point);
+    constructor(point1: Point, point2: Point, point3: Point, color?: string, filled?: boolean) {
+        super([point1, point2, point3], color, filled);
     }
 
     toString(): string {
