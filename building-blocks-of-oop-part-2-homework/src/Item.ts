@@ -39,7 +39,7 @@ export class Item implements Comparable<Item> {
     }
 
     toString(): string {
-        return `${this.name} - Value: ${this.value}, Weight: ${this.weight}`;
+        return `${this.name} − Value: ${this.value.toFixed(2)}, Weight: ${this.weight.toFixed(2)}`;
     }
 
     getId(): number {
