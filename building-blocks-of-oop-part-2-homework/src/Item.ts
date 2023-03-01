@@ -19,10 +19,6 @@ export class Item implements Comparable<Item> {
         Item.idCounter = 0;
     }
 
-    use() {
-
-    }
-
     compareTo(other: Item): number {
         switch (true) {
             case this.value > other.value:

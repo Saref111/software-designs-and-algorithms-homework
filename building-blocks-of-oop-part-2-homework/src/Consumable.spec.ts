@@ -2,7 +2,6 @@
 
 import { Consumable } from "./Consumable";
 
-// @ts-expect-error
 new Consumable("bread", 1, 1);
 
 class ConsumableWithImplementation extends Consumable {}
