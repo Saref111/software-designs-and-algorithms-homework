@@ -11,8 +11,8 @@ export class Item implements Comparable<Item> {
         this.name = name;
         this.value = value;
         this.weight = weight;
+        Item.idCounter += 1;
         this.id = Item.idCounter;
-        Item.idCounter++;
     }
 
     static resetIdCounter() {
