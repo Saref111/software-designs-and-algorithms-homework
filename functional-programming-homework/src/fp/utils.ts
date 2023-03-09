@@ -24,7 +24,7 @@ export function pipe<A, B, C>(a: A, fb: (a: A) => B, fc: (b: B) => C): C;
 export function pipe<A, B, C, D>(a: A, fb: (a: A) => B, fc: (b: B) => C, fd: (c: C) => D): D;
 export function pipe<A, B, C, D, E>(a: A, fb: (a: A) => B, fc: (b: B) => C, fd: (c: C) => D, fe: (d: D) => E): E;
 export function pipe(a: any, ...fns: Array<(...args: Array<any>) => any>) {
-
+  return fns.reduce((acc, f) => f(acc), a);
 }
 
 export type Predicate<A> = (a: A) => boolean

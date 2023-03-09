@@ -84,6 +84,7 @@ export const getOrElse = <E, A>(onLeft: (e: E) => A) => (ma: Either<E, A>): A =>
  * fold Either<E, A> => B
  * reduce Array<A> => B
  */
-export const fold = <E, A, B>(onLeft: (e: E) => B, onRight: (a: A) => B) => (ma: Either<E, A>): B => (
-);
+export const fold = <E, A, B>(onLeft: (e: E) => B, onRight: (a: A) => B) => (ma: Either<E, A>): B => {
+  return isRight(ma) ? onRight(ma.right) : onLeft(ma.left)
+};
 
