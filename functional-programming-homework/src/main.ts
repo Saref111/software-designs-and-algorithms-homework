@@ -1,12 +1,19 @@
-import { Either, fromPromise, ap, right, getOrElse, flatten } from './fp/either';
-import { pipe } from './fp/utils';
+import { Either, fromPromise, ap, right, getOrElse, flatten, left } from './fp/either';
+import {  pipe } from './fp/utils';
 import { fetchClient, fetchExecutor } from './fetching';
 import { ClientUser, ExecutorUser } from './types';
+import { fromNullable, none, some } from './fp/maybe';
+import { map, sort } from './fp/array';
+import { fromCompare, Ordering, revert } from './fp/ord';
+import { distance } from './utils';
 
 type Response<R> = Promise<Either<string, R>>
+ 
 
 const getExecutor = (): Response<ExecutorUser> => fromPromise(fetchExecutor());
-const getClients = (): Response<Array<ClientUser>> => fromPromise(fetchClient());
+const getClients = (): Response<Array<ClientUser>> => fromPromise<string, Array<ClientUser>>(fetchClient().then((v) => {
+  return pipe(v, (arr) => map<typeof arr[number], ClientUser>((it) => ({...it, demands: fromNullable(it.demands)}))(arr))
+}));
 
 export enum SortBy {
   distance = 'distance',
@@ -14,7 +21,12 @@ export enum SortBy {
 }
 
 export const show = (sortBy: SortBy) => (clients: Array<ClientUser>) => (executor: ExecutorUser): Either<string, string> => {
-
+  const ord = fromCompare((first: ClientUser, second: ClientUser) => {
+    distance(first.position, second.position)
+    return first.position.x === second[sortBy] ? Ordering.equal : first[sortBy] === second[sortBy] ? Ordering.greater : Ordering.less
+  })
+  
+  return right('') 
 };
 
 export const main = (sortBy: SortBy): Promise<string> => (

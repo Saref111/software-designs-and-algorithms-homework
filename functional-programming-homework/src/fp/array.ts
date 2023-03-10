@@ -1,6 +1,6 @@
 import { Ord } from './ord';
 
-export const map = <A, B>(f: (elem: A, index: number, target: Array<A>) => B) => (list: Array<A>) => (
+export const map = <A, B>(f: (elem: A, index: number, target: Array<A>) => B) => (list: Array<A>): Array<B> => (
   list.map(f)
 );
 
