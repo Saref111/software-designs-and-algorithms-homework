@@ -1,10 +1,10 @@
-import { Either, fromPromise, ap, right, getOrElse, flatten, left } from './fp/either';
-import {  pipe } from './fp/utils';
+import { Either, fromPromise, ap, right, flatten, left, getOrElse } from './fp/either';
+import {  flow, matcher, pipe } from './fp/utils';
 import { fetchClient, fetchExecutor } from './fetching';
-import { ClientUser, ExecutorUser } from './types';
-import { fromNullable, none, some } from './fp/maybe';
+import { ClientUser, ExecutorUser, Demand } from './types';
+import { fromNullable, isNone, isSome, none, some, getOrElse as getOrElseMaybe } from './fp/maybe';
 import { map, sort } from './fp/array';
-import { fromCompare, Ordering, revert } from './fp/ord';
+import { fromCompare, Ordering, ordNumber, revert } from './fp/ord';
 import { distance } from './utils';
 
 type Response<R> = Promise<Either<string, R>>
@@ -21,12 +21,38 @@ export enum SortBy {
 }
 
 export const show = (sortBy: SortBy) => (clients: Array<ClientUser>) => (executor: ExecutorUser): Either<string, string> => {
-  const ord = fromCompare((first: ClientUser, second: ClientUser) => {
-    distance(first.position, second.position)
-    return first.position.x === second[sortBy] ? Ordering.equal : first[sortBy] === second[sortBy] ? Ordering.greater : Ordering.less
-  })
+  const rewardPred = (x: ClientUser, y: ClientUser) => x.reward === y.reward ? Ordering.equal 
+                                                    :  x.reward < y.reward ? Ordering.greater : Ordering.less
+  const distancePred = (x: ClientUser, y: ClientUser) => distance(x.position, executor.position) === distance(y.position, executor.position) ? Ordering.equal 
+                                                    : distance(x.position, executor.position) > distance(y.position, executor.position) ? Ordering.greater : Ordering.less;
+  const predicate = sortBy === SortBy.reward ? rewardPred : distancePred                            
+  const ordClient = fromCompare(predicate)
+  const sortedClients = sort(ordClient)(clients);
   
-  return right('') 
+  const filtered = sortedClients.filter((c: ClientUser) => 
+    isNone(c.demands) || getOrElseMaybe(() => [])(c.demands).some(
+      (v: Demand) => executor.possibilities.some((vp) => v === vp)
+    ) 
+  )
+
+const meetMatcher = matcher(
+  [(l: number) => !l, () => 'cannot meet the demands of any client!'],
+                [(l: number) => l === sortedClients.length, () => 'meets all demands of all clients!'],
+                [(l: number) => l < sortedClients.length, (l) => `meets the demands of only ${l} out of ${sortedClients.length} clients`]
+)
+
+const sortByMatcher = matcher(
+  [(s: SortBy) => s === SortBy.reward, (s) => 'highest reward'],
+                [(s: SortBy) => s === SortBy.distance, (s) => 'distance to executor'],
+)
+
+return pipe(
+  'This executor ', 
+  (str) => str + meetMatcher(filtered.length),
+  (str) => str + (filtered.length ? '\n\nAvailable clients sorted by ' + sortByMatcher(sortBy) + ':\n' : ''),
+  (str) => str + map((el: ClientUser) => `name: ${el.name}, distance: ${distance(el.position, executor.position)}, reward: ${el.reward}`)(filtered).join('\n'),
+    (str) => filtered.length ? right(str) : left(str)
+  )
 };
 
 export const main = (sortBy: SortBy): Promise<string> => (
