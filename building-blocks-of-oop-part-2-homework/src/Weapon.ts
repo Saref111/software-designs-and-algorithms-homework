@@ -31,6 +31,6 @@ export abstract class Weapon extends Item {
             return `You can't use the ${this.name}, it is broken.`
         }
         this.baseDurability = this.baseDurability - Weapon.MODIFIER_CHANGE_RATE
-        return `You use the ${this.name}, dealing ${Weapon.MODIFIER_CHANGE_RATE} points of damage.${this.baseDurability <= 0 ? `\nThe ${this.name} breaks.` : ''}`
+        return `You use the ${this.name}, dealing ${this.getEffectiveDamage()} points of damage.${this.baseDurability <= 0 ? `\nThe ${this.name} breaks.` : ''}`
     }
 }
