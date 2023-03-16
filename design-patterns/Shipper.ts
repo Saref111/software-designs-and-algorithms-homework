@@ -1,13 +1,13 @@
+import { Oversized, Package, Shipment } from "./Shipment";
+
 abstract class AbstractShipper {
-    public abstract getCost(): number;
+    public abstract getCost(shipment: Shipment): number;
 }
 
 class AirEastShipper extends AbstractShipper {
     private static instance: AirEastShipper;
-    private shipmentCount = 0;
     private name = "Air East";
     private location = "Atlanta";
-    private costPerOunce = 0.39;
 
     private constructor() { 
         super();
@@ -18,16 +18,16 @@ class AirEastShipper extends AbstractShipper {
         }
         return AirEastShipper.instance;
     }
-    public getCost(): number {
-        return this.costPerOunce;
+    public getCost(shipment: Shipment): number {
+        if (shipment instanceof Oversized) return 10 + 0.25 * shipment.getWeight();
+        else if (shipment instanceof Package) return 0.25 * shipment.getWeight();
+        return 0.39;
     }
 }
 class ChicagoSprintShipper extends AbstractShipper {
     private static instance: ChicagoSprintShipper;
-    private shipmentCount = 0;
     private name = "Chicago Sprint";
-    private location = "Chicago";    
-    private costPerOunce = 0.42;
+    private location = "Chicago"; 
 
     private constructor() { 
         super();
@@ -38,17 +38,17 @@ class ChicagoSprintShipper extends AbstractShipper {
         }
         return ChicagoSprintShipper.instance;
     }
-    public getCost(): number {
-        return this.costPerOunce;
+    public getCost(shipment: Shipment): number {
+        if (shipment instanceof Oversized) throw new Error("No charge for oversized shipments");
+        else if (shipment instanceof Package) return 0.2 * shipment.getWeight();
+        return 0.42;
     }
 }
 
 class PacificParcelShipper extends AbstractShipper {
     private static instance: PacificParcelShipper;
-    private shipmentCount = 0;
     private name = "Pacific Parcel";
     private location = "San Diego";
-    private costPerOunce = 0.51; 
 
     private constructor() { 
         super();
@@ -59,35 +59,37 @@ class PacificParcelShipper extends AbstractShipper {
         }
         return PacificParcelShipper.instance;
     }
-    public getCost(): number {
-        return this.costPerOunce;
+    public getCost(shipment: Shipment): number {
+        if (shipment instanceof Oversized) return 0.21 * shipment.getWeight();
+        else if (shipment instanceof Package) return 0.19 * shipment.getWeight();
+        return 0.51;
     }
 }
 
 export class Shipper {
-    private shipper: AbstractShipper;
+    private shipperInstance: AbstractShipper;
     constructor(zipCode: string) {
         switch (zipCode[0]) {
             case "1":
             case "2":
             case "3":
-                this.shipper = AirEastShipper.getInstance();
+                this.shipperInstance = AirEastShipper.getInstance();
                 break;
             case "4":
             case "5":
             case "6":
-                this.shipper = ChicagoSprintShipper.getInstance();
+                this.shipperInstance = ChicagoSprintShipper.getInstance();
                 break;
             case "7":
             case "8":
             case "9":
-                this.shipper = PacificParcelShipper.getInstance();
+                this.shipperInstance = PacificParcelShipper.getInstance();
                 break;
             default:
-                this.shipper = AirEastShipper.getInstance();
+                this.shipperInstance = AirEastShipper.getInstance();
         }
     }
-    public getCost(): number {
-        return this.shipper.getCost();
+    public getCost(shipment: Shipment): number {
+        return this.shipperInstance.getCost(shipment);
     }
 }
