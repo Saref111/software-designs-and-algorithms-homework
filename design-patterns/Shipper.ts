@@ -1,4 +1,4 @@
-import { Oversized, Package, Shipment } from "./Shipment";
+import { MaxWeight, Oversized, Package, Shipment } from "./Shipment";
 
 abstract class AbstractShipper {
     public abstract getCost(shipment: Shipment): number;
@@ -19,8 +19,8 @@ class AirEastShipper extends AbstractShipper {
         return AirEastShipper.instance;
     }
     public getCost(shipment: Shipment): number {
-        if (shipment instanceof Oversized) return 10 + 0.25 * shipment.getWeight();
-        else if (shipment instanceof Package) return 0.25 * shipment.getWeight();
+        if (shipment.weight > MaxWeight.PACKAGE) return 10 + 0.25 * shipment.weight;
+        else if (shipment.weight > MaxWeight.LETTER) return 0.25 * shipment.weight;
         return 0.39;
     }
 }
@@ -39,8 +39,8 @@ class ChicagoSprintShipper extends AbstractShipper {
         return ChicagoSprintShipper.instance;
     }
     public getCost(shipment: Shipment): number {
-        if (shipment instanceof Oversized) throw new Error("No charge for oversized shipments");
-        else if (shipment instanceof Package) return 0.2 * shipment.getWeight();
+        if (shipment.weight > MaxWeight.PACKAGE) throw new Error("No charge for oversized shipments");
+        else if (shipment.weight > MaxWeight.PACKAGE) return 0.2 * shipment.weight;
         return 0.42;
     }
 }
@@ -60,8 +60,8 @@ class PacificParcelShipper extends AbstractShipper {
         return PacificParcelShipper.instance;
     }
     public getCost(shipment: Shipment): number {
-        if (shipment instanceof Oversized) return 0.21 * shipment.getWeight();
-        else if (shipment instanceof Package) return 0.19 * shipment.getWeight();
+        if (shipment.weight > MaxWeight.PACKAGE) return 0.21 * shipment.weight;
+        else if (shipment.weight > MaxWeight.LETTER) return 0.19 * shipment.weight;
         return 0.51;
     }
 }
